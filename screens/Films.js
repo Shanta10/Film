@@ -9,8 +9,7 @@ const Films = () => {
   const [films, setFilms] = useState([]);
 
   useEffect(() => {
-    // Obtener todos los films
-    fetch('http://localhost:8080/film')
+    fetch('http://10.0.1.159:8080/film')
       .then(response => response.json())
       .then(data => setFilms(data))
       .catch(error => console.error('Error fetching films:', error));
@@ -18,15 +17,22 @@ const Films = () => {
 
   const navigateToScenes = async (filmId) => {
     try {
-      // Obtener solo las escenas del film seleccionado
-      const scenesResponse = await fetch(`http://localhost:8080/scene?filmId=${filmId}`);
+      const scenesResponse = await fetch(`http://10.0.1.159:8080/scene?filmId=${filmId}`);
       const scenesData = await scenesResponse.json();
-      navigation.navigate('Scenes', { scenes: scenesData });
+      navigation.navigate('Scenes', { scenes: scenesData, filmId: filmId });
     } catch (error) {
       console.error('Error navigating to scenes:', error);
     }
   };
+
+  const navigateToFilmsUpdate = (filmId) => {
+    navigation.navigate('FilmsUpdate', { filmId: filmId });
+  };
   
+
+  const navigateToFilmsDelete = (filmId) => {
+    navigation.navigate('FilmsDelete', { filmId: filmId });
+  };
   
 
   return (
@@ -41,16 +47,19 @@ const Films = () => {
               title={film.title}
               subtitle1={`Director: ${film.director}`}
               subtitle2={`Duración: ${film.duration} minutos`}
+              onEditPress={navigateToFilmsUpdate}
+              onDeletePress={navigateToFilmsDelete}
             />
           </TouchableOpacity>
         ))}
       </ScrollView>
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('FilmsSet')}
+        onPress={() => navigation.navigate('Add Film')}
       >
         <Icon name="plus" size={30} color="#007bff" />
       </TouchableOpacity>
+      
     </View>
   );
 };

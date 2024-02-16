@@ -1,45 +1,41 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
-const ScenesSet = ({ route }) => {
-  const { filmId } = route.params;
+const ScenesUpdate = ({ route }) => {
+  const { sceneId } = route.params;
   const [description, setDescription] = useState('');
   const [budget, setBudget] = useState('');
   const [minutes, setMinutes] = useState('');
 
-  const handleAddScene = async () => {
+  const handleUpdateScene = async () => {
     try {
-      const sceneData = {
+      const updatedSceneData = {
         description: description,
         budget: Number(budget),
         minutes: Number(minutes),
-        filmId: filmId,
       };
 
-      const response = await fetch('http://10.0.1.159:8080/scene', {
-        method: 'POST',
+      const response = await fetch(`http://10.0.1.159:8080/scene/${sceneId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(sceneData),
+        body: JSON.stringify(updatedSceneData),
       });
 
       if (response.ok) {
-        alert('Nueva escena agregada con éxito!');
-        setDescription('');
-        setBudget('');
-        setMinutes('');
+        alert('Escena actualizada con éxito!');
       } else {
-        alert('Error al agregar la escena:', response.statusText);
+        alert('Error al actualizar la escena:', response.statusText);
       }
     } catch (error) {
-      console.error('Error al agregar la escena:', error);
+      console.error('Error al actualizar la escena:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Agregar Escena</Text>
+      <Text style={styles.title}>Actualizar Escena</Text>
       <TextInput
         style={styles.input}
         value={description}
@@ -60,7 +56,7 @@ const ScenesSet = ({ route }) => {
         placeholder="Minutos"
         keyboardType="numeric"
       />
-      <Button title="Agregar Escena" onPress={handleAddScene} />
+      <Button title="Actualizar Escena" onPress={handleUpdateScene} />
     </View>
   );
 };
@@ -87,4 +83,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScenesSet;
+export default ScenesUpdate;

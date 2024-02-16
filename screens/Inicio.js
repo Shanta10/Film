@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import Button from '../components/Button'; // Importa el componente Button
+import Button from '../components/Button';
 
 const Inicio = ({ navigation }) => {
   return (

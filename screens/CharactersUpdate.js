@@ -1,42 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
-const CharactersSet = ({ route }) => {
-  const { sceneId } = route.params;
+const CharactersUpdate = ({ route }) => {
+  const { characterId } = route.params;
   const [description, setDescription] = useState('');
   const [cost, setCost] = useState('');
 
-  const handleAddCharacter = async () => {
+  useEffect(() => {
+    const fetchCharacter = async () => {
+      try {
+        const response = await fetch(`http://10.0.1.159:8080/characters/${characterId}`);
+        const data = await response.json();
+        setDescription(data.description);
+        setCost(data.cost.toString());
+      } catch (error) {
+        console.error('Error fetching character:', error);
+      }
+    };
+
+    fetchCharacter();
+  }, [characterId]);
+
+  const handleUpdateCharacter = async () => {
     try {
-      const characterData = {
+      const updatedCharacterData = {
         description: description,
         cost: Number(cost),
-        sceneId: sceneId,
       };
 
-      const response = await fetch('http://10.0.1.159:8080/characters', {
-        method: 'POST',
+      const response = await fetch(`http://10.0.1.159:8080/characters/${characterId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(characterData),
+        body: JSON.stringify(updatedCharacterData),
       });
 
       if (response.ok) {
-        alert('Nuevo personaje agregado con éxito!');
-        setDescription('');
-        setCost('');
+        alert('Personaje actualizado con éxito!');
       } else {
-        alert('Error al agregar el personaje:', response.statusText);
+        alert('Error al actualizar el personaje:', response.statusText);
       }
     } catch (error) {
-      console.error('Error al agregar el personaje:', error);
+      console.error('Error al actualizar el personaje:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Agregar Personaje</Text>
+      <Text style={styles.title}>Actualizar Personaje</Text>
       <TextInput
         style={styles.input}
         value={description}
@@ -50,7 +62,7 @@ const CharactersSet = ({ route }) => {
         placeholder="Costo"
         keyboardType="numeric"
       />
-      <Button title="Agregar Personaje" onPress={handleAddCharacter} />
+      <Button title="Actualizar Personaje" onPress={handleUpdateCharacter} />
     </View>
   );
 };
@@ -77,4 +89,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CharactersSet;
+export default CharactersUpdate;

@@ -1,41 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
-const FilmsSet = () => {
+const FilmsUpdate = () => {
   const [title, setTitle] = useState('');
   const [director, setDirector] = useState('');
   const [duration, setDuration] = useState('');
+  const route = useRoute();
+  const { filmId } = route.params;
 
-  const handleAddFilm = async () => {
+  useEffect(() => {
+    const fetchFilmData = async () => {
+      try {
+        const response = await fetch(`http://10.0.1.159:8080/film/${filmId}`);
+        const filmData = await response.json();
+        setTitle(filmData.title);
+        setDirector(filmData.director);
+        setDuration(filmData.duration.toString());
+      } catch (error) {
+        console.error('Error fetching film data:', error);
+      }
+    };
+
+    fetchFilmData();
+  }, [filmId]);
+
+  const handleUpdateFilm = async () => {
     try {
-      const filmData = {
+      const updatedFilmData = {
         title: title,
         director: director,
         duration: Number(duration),
       };
 
-      const response = await fetch('http://localhost:8080/film', {
-        method: 'POST',
+      const response = await fetch(`http://10.0.1.159:8080/film`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(filmData),
+        body: JSON.stringify(updatedFilmData),
       });
 
       if (response.ok) {
-        alert('Nuevo Film agregado con éxito!');
-        navigation.goBack();
+        alert('Film actualizado con éxito!');
       } else {
-        alert('Error al agregar el Film:', response.statusText);
+        alert('Error al actualizar el Film:', response.statusText);
       }
     } catch (error) {
-      console.error('Error al agregar el film:', error);
+      console.error('Error al actualizar el film:', error);
+    }
+    finally {
+      navigation.goBack();
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Agregar Film</Text>
+      <Text style={styles.title}>Actualizar Film</Text>
       <TextInput
         style={styles.input}
         value={title}
@@ -55,7 +76,7 @@ const FilmsSet = () => {
         placeholder="Duración (minutos)"
         keyboardType="numeric"
       />
-      <Button title="Agregar Film" onPress={handleAddFilm} />
+      <Button title="Actualizar Film" onPress={handleUpdateFilm} />
     </View>
   );
 };
@@ -82,4 +103,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FilmsSet;
+export default FilmsUpdate;
